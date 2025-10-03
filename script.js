@@ -2,8 +2,41 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Background music autoplay with better mobile support
+    // Background music autoplay with clever fullscreen button
     const bgMusic = document.getElementById('background-music');
+    
+    // Create invisible fullscreen button for music activation
+    const fullscreenButton = document.createElement('button');
+    fullscreenButton.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        z-index: 9999;
+    `;
+    fullscreenButton.innerHTML = `
+        <div style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-family: Inter, sans-serif;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        ">🎵 Нажмите для запуска музыки</div>
+    `;
+    document.body.appendChild(fullscreenButton);
+    
+    // Regular music control button (will be shown after activation)
     const musicControl = document.createElement('button');
     musicControl.textContent = '🎵';
     musicControl.style.cssText = `
@@ -20,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         cursor: pointer;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         transition: all 0.3s ease;
+        display: none;
     `;
     document.body.appendChild(musicControl);
 
@@ -57,6 +91,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Fullscreen button click handler
+    fullscreenButton.addEventListener('click', () => {
+        playMusic();
+        fullscreenButton.style.display = 'none'; // Hide fullscreen button
+        musicControl.style.display = 'block'; // Show regular control button
+    });
+    
+    // Touch support for mobile
+    fullscreenButton.addEventListener('touchstart', () => {
+        playMusic();
+        fullscreenButton.style.display = 'none';
+        musicControl.style.display = 'block';
+    });
+
+    // Regular control button click handler
     musicControl.addEventListener('click', () => {
         if (musicPlaying) {
             pauseMusic();
@@ -74,26 +123,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (playPromise !== undefined) {
                 playPromise.then(() => {
                     musicPlaying = true;
-                    updateMusicControl();
-                }).catch(() => {
-                    // Autoplay blocked - show control button prominently
+                    fullscreenButton.style.display = 'none';
                     musicControl.style.display = 'block';
-                    
-                    // Try on user interactions
-                    const playOnInteraction = () => {
-                        playMusic();
-                        document.removeEventListener('click', playOnInteraction);
-                        document.removeEventListener('touchstart', playOnInteraction);
-                        document.removeEventListener('keydown', playOnInteraction);
-                    };
-                    
-                    document.addEventListener('click', playOnInteraction);
-                    document.addEventListener('touchstart', playOnInteraction);
-                    document.addEventListener('keydown', playOnInteraction);
+                    updateMusicControl();
+                    console.log('✅ Music autoplay successful');
+                }).catch(() => {
+                    // Autoplay blocked - show fullscreen activation button
+                    console.log('❌ Autoplay blocked, showing fullscreen activation');
+                    fullscreenButton.style.display = 'block';
                 });
             }
         }
-    }, 1000);
+    }, 500);
 
     updateMusicControl();
     
