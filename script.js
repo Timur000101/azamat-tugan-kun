@@ -5,35 +5,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Background music autoplay with clever fullscreen button
     const bgMusic = document.getElementById('background-music');
     
-    // Create invisible fullscreen button for music activation
-    const fullscreenButton = document.createElement('button');
+    // Create completely transparent fullscreen button for music activation
+    const fullscreenButton = document.createElement('div');
     fullscreenButton.style.cssText = `
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
+        max-width: 100%;
+        max-height: 100%;
         background: transparent;
         border: none;
         cursor: pointer;
         z-index: 9999;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        pointer-events: auto;
     `;
-    fullscreenButton.innerHTML = `
-        <div style="
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 20px 40px;
-            border-radius: 10px;
-            font-size: 18px;
-            font-family: Inter, sans-serif;
-            text-align: center;
-            backdrop-filter: blur(10px);
-        ">🎵 Нажмите для запуска музыки</div>
-    `;
+    // Empty content - completely transparent
     document.body.appendChild(fullscreenButton);
     
     // Regular music control button (will be shown after activation)
